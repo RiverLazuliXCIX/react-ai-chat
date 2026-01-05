@@ -12,7 +12,7 @@ export default defineConfig({
         target: apiProxyTarget,
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        rewrite: (path) => path.replace(/^\/api/, "/api"),
       },
     },
   },

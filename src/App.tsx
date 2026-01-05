@@ -1,20 +1,48 @@
-import './App.css'
-import {useEffect, useState} from "react";
+import "./App.css";
+import { useEffect, useState } from "react";
+import { useCompletion } from "@ai-sdk/react";
 
 function App() {
-    const [apiResponse, setApiResponse] = useState("");
+  const { input, completion, handleInputChange, handleSubmit } = useCompletion({
+    api: "/api/chat",
+    headers: { "Content-Type": "application/json" },
+    streamProtocol: "text",
+  });
 
-    useEffect(() => {
-        fetch("/api/health")
-            .then((response) => response.json())
-            .then((result) => setApiResponse(JSON.stringify(result)));
-    }, []);
+  const [apiResponse, setApiResponse] = useState("");
 
-    return (
-        <div>
-            <h1>{apiResponse}</h1>
-        </div>
-    );
+  useEffect(() => {
+    fetch("/api/health")
+      .then((response) => response.json())
+      .then((result) => setApiResponse(JSON.stringify(result)));
+  }, []);
+
+  useEffect(() => {
+    console.log("completion updated:", completion);
+  }, [completion]);
+
+  return (
+    <div>
+      <h1>React AI Chat</h1>
+      <p>Health check status:</p>
+      <code>{apiResponse}</code>
+
+      <h2>Enter text below!</h2>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="ask-input"></label>
+        <input
+          id="ask-input"
+          type="text"
+          value={input}
+          onChange={handleInputChange}
+        />
+
+        <button type="submit">Submit</button>
+      </form>
+
+      <p>{completion}</p>
+    </div>
+  );
 }
 
-export default App
+export default App;
