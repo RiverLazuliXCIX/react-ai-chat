@@ -3,12 +3,18 @@ import { useEffect, useState } from "react";
 import { useCompletion } from "@ai-sdk/react";
 
 function App() {
-  const { input, completion, handleInputChange, handleSubmit, isLoading } =
-    useCompletion({
-      api: "/api/chat",
-      headers: { "Content-Type": "application/json" },
-      streamProtocol: "text",
-    });
+  const {
+    input,
+    completion,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    error,
+  } = useCompletion({
+    api: "/api/chat",
+    headers: { "Content-Type": "application/json" },
+    streamProtocol: "text",
+  });
 
   const [apiResponse, setApiResponse] = useState("");
 
@@ -45,6 +51,9 @@ function App() {
         </button>
       </form>
 
+      {error && (
+        <p style={{ color: "red" }}>An error occurred: {error.message}</p>
+      )}
       <p>{completion}</p>
     </div>
   );

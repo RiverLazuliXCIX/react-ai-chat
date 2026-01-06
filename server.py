@@ -17,6 +17,9 @@ app_host = os.environ.get("APP_HTTP_HOST", "127.0.0.1")
 app_port = int(os.environ.get("APP_HTTP_PORT", 5000))
 ai_agent_api_key = os.environ.get("GOOGLE_API_KEY")
 
+if not ai_agent_api_key:
+    raise ValueError("GOOGLE_API_KEY is not set in environment variables")
+
 app = FastAPI()
 
 model = ChatGoogleGenerativeAI(
