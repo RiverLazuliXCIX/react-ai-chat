@@ -13,6 +13,7 @@ pip install -r requirements.txt
 ```
 
 Then install frontend dependencies with
+
 ```
 npm install
 ```
@@ -21,11 +22,13 @@ You will also need to create a .env file based on the .env.example file, providi
 case, that's Gemini - you can get an API key from [here]("https://aistudio.google.com/").
 
 To start the backend server that hosts the health check and chat endpoints, use the following:
+
 ```
 npm run server
 ```
 
 Then, start the vite dev server with:
+
 ```
 npm run dev
 ```

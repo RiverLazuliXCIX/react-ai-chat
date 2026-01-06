@@ -3,18 +3,20 @@ import { useEffect, useState } from "react";
 import { useCompletion } from "@ai-sdk/react";
 
 function App() {
-  const { input, completion, handleInputChange, handleSubmit } = useCompletion({
-    api: "/api/chat",
-    headers: { "Content-Type": "application/json" },
-    streamProtocol: "text",
-  });
+  const { input, completion, handleInputChange, handleSubmit, isLoading } =
+    useCompletion({
+      api: "/api/chat",
+      headers: { "Content-Type": "application/json" },
+      streamProtocol: "text",
+    });
 
   const [apiResponse, setApiResponse] = useState("");
 
   useEffect(() => {
     fetch("/api/health")
       .then((response) => response.json())
-      .then((result) => setApiResponse(JSON.stringify(result)));
+      .then((result) => setApiResponse(JSON.stringify(result)))
+      .catch(() => setApiResponse("Server unreachable"));
   }, []);
 
   useEffect(() => {
@@ -29,15 +31,18 @@ function App() {
 
       <h2>Enter text below!</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="ask-input"></label>
+        <label htmlFor="ask-input">Message AI:</label>
         <input
           id="ask-input"
           type="text"
           value={input}
+          disabled={isLoading}
           onChange={handleInputChange}
         />
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={isLoading || !input}>
+          {isLoading ? "Thinking..." : "Submit"}
+        </button>
       </form>
 
       <p>{completion}</p>

@@ -13,13 +13,11 @@ load_dotenv('.env')
 app_base = path.dirname(__file__)
 app_root = path.join(app_base, '../')
 
-app_host = os.environ.get("APP_HTTP_HOST")
-app_port = int(os.environ.get("APP_HTTP_PORT"))
-ai_agent_api_key = os.environ.get("OPENAI_API_KEY")
+app_host = os.environ.get("APP_HTTP_HOST", "127.0.0.1")
+app_port = int(os.environ.get("APP_HTTP_PORT", 5000))
+ai_agent_api_key = os.environ.get("GOOGLE_API_KEY")
 
 app = FastAPI()
-
-
 
 model = ChatGoogleGenerativeAI(
     model="gemini-3-pro-preview",
@@ -31,6 +29,7 @@ model = ChatGoogleGenerativeAI(
     streaming=True,
 )
 
+
 def generator(prompt: str):
     messages = [("human", prompt)]
 
@@ -40,15 +39,18 @@ def generator(prompt: str):
 
         yield chunk.text
 
+
 class ChatRequest(BaseModel):
     prompt: str
+
 
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
 
+
 @app.post("/api/chat")
-def chat(request:ChatRequest):
+def chat(request: ChatRequest):
     return StreamingResponse(
         generator(request.prompt),
         media_type="text/plain; charset=utf-8",
@@ -58,6 +60,7 @@ def chat(request:ChatRequest):
             "X-Accel-Buffering": "no",
         },
     )
+
 
 if __name__ == "__main__":
     uvicorn.run("server:app", host=app_host, reload=True, port=app_port)
