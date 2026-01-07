@@ -28,8 +28,6 @@ form {
 .health-check {
   border: 1px solid #ccc;
   border-radius: 8px;
-  overflow: scroll;
-  background-color: red;
 }
 
 .ai-response {

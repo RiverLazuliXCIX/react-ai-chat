@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { Streamdown } from "streamdown";
 import { PulseLoader } from "react-spinners";
@@ -18,39 +18,30 @@ function App() {
     streamProtocol: "text",
   });
 
-  const [apiResponse, setApiResponse] = useState("");
+  const [healthCheckResponse, setHealthCheckResponse] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     fetch("/api/health")
       .then((response) => response.json())
-      .then((result) => setApiResponse(result.status))
-      .catch(() => setApiResponse("Server unreachable"));
-
-    const healthCheckElement = document.getElementById("health-check");
-    if (apiResponse === "healthy")
-      healthCheckElement!.style.backgroundColor = "green";
-    else healthCheckElement!.style.backgroundColor = "red";
-  }, [apiResponse]);
+      .then((result) => setHealthCheckResponse(result.status))
+      .catch(() => setHealthCheckResponse("Server unreachable"));
+  }, []);
 
   useEffect(() => {
-    const aiResponse = document.getElementById("ai-response-bottom");
-
-    if (aiResponse === null) return;
-
-    aiResponse.scrollIntoView({ behavior: "smooth" });
-  }, [completion]);
+    if (isLoading && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [completion, isLoading]);
 
   function scrollToTop() {
-    const header = document.getElementById("header");
-
-    if (header === null) return;
-
-    header.scrollIntoView({ behavior: "smooth" });
+    headerRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
     <>
-      <header id={"header"}>
+      <header ref={headerRef}>
         <h1>React AI Chat</h1>
       </header>
       <main>
@@ -77,15 +68,15 @@ function App() {
           {isLoading && <PulseLoader color={"#fff"}/>}
           <Streamdown>{completion}</Streamdown>
         </div>
-        <div id={"ai-response-bottom"}>
+        <div ref={bottomRef} id={"ai-response-bottom"}>
           {!isLoading && completion && (
             <button onClick={scrollToTop}>Go to top ⇑</button>
           )}
         </div>
       </main>
 
-      <footer id={"health-check"} className={"health-check"}>
-        <p>Health check status: {apiResponse}</p>
+      <footer className={`health-check transition-colors duration-700 ${healthCheckResponse === 'healthy' ? 'bg-green-600' : 'bg-red-600'}`}>
+        <p>Health check status: {healthCheckResponse}</p>
       </footer>
     </>
   );
